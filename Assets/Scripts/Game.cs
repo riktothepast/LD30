@@ -31,13 +31,14 @@ public class Game : MonoBehaviour
 
                 FutileParams fparams = new FutileParams(true, true, false, false);
                 fparams.targetFrameRate = 30;
-				fparams.AddResolutionLevel (510, 1f, 1.0f, ""); //base res
+				fparams.AddResolutionLevel (480, 1f, 1.0f, ""); //base res
                 
 				fparams.origin = new Vector2 (0.0f, 0.0f);
 		
 				Futile.instance.Init (fparams);
 				GameConfig.LoadPreviousConfig();
-		
+
+                Futile.atlasManager.LoadAtlas("Atlases/SpriteSheet");
 				
 				_stage = Futile.stage;
 		

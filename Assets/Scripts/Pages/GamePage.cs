@@ -7,7 +7,7 @@ public class GamePage : Page
     bool started;
     FContainer touchControlsContainer;
     public static FContainer HeadsUpDisplay;
-
+    public Vector2 camera = Vector2.zero;
 
     public GamePage()
     {
@@ -25,21 +25,21 @@ public class GamePage : Page
     override public void Start()
     {
         tileMap = new TileMap(this);
-        tileMap.LoadTileMap("Texts/newLevelSize");
+        tileMap.LoadTileMap("Text/testMap");
         Futile.stage.AddChild(tileMap);
         Futile.stage.AddChild(HeadsUpDisplay);
         
         ListenForUpdate(Update);
         
-        GetHUD().AddChild(TileMap.CurrentMap.MessageLabel);
     }
 
 
     // Update is called once per frame
     public void Update()
     {
-		
-
+        camera.x += Input.GetAxis("Horizontal") * 10f;
+        camera.y += Input.GetAxis("Vertical") * 10f;
+        FollowVector(camera);
     }
 
 

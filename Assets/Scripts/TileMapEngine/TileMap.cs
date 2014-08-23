@@ -113,7 +113,7 @@ public class TileMap : FContainer
         AddChild(entityContainer);
         frontContainer = new FContainer();
         AddChild(frontContainer);
-        messageLabel.SetPosition(new Vector2(Futile.screen.halfWidth, Futile.screen.halfHeight));
+
     }
 
     // update the tilemap based on whats visible ?. 

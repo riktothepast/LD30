@@ -8,4 +8,13 @@ public class Player : Entity {
     float bulletImpact;
     public float BulletImpact { set { bulletImpact = value; } get { return bulletImpact; } }
 
+    public Player()
+    {
+        HealthPoints = 100;
+        useGravity = true;
+        Gravity = 19.6f;
+        weatherResistance = Vector2.zero;
+        bulletImpact = 5f;
+    }
+
 }

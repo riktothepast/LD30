@@ -30,20 +30,13 @@ public class LevelData {
         mapReader.Read();
         XmlDocument doc = new XmlDocument();
         doc.LoadXml(mapReader.ReadOuterXml());
-        mapSize = new Vector2((float)int.Parse(doc.ChildNodes[0].Attributes[0].Value)/12, (float)int.Parse(doc.ChildNodes[0].Attributes[1].Value)/12);
+        mapSize = new Vector2((float)int.Parse(doc.ChildNodes[0].Attributes[0].Value)/16, (float)int.Parse(doc.ChildNodes[0].Attributes[1].Value)/16);
         for (int x = 0; x < doc.ChildNodes[0].ChildNodes.Count; x++)
         {
             if (doc.ChildNodes[0].ChildNodes[x].Name.ToLower().Equals("frontlayer")) {
                 LoadTiles(doc.ChildNodes[0].ChildNodes[x], platforms);
             }
-            if (doc.ChildNodes[0].ChildNodes[x].Name.ToLower().Equals("backgroundlayer"))
-            {
-                
-            }
-            if (doc.ChildNodes[0].ChildNodes[x].Name.ToLower().Equals("entities"))
-            {
-                LoadSpawnPoints(doc.ChildNodes[0].ChildNodes[x]);
-            }
+
         }
     }
 
@@ -72,15 +65,15 @@ public class LevelData {
         for (int x = 0; x < spawns.ChildNodes.Count; x++) {
 
             if (spawns.ChildNodes[x].Name.ToLower().Equals("playerspawn")) {
-                playerSpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value)/12, int.Parse(spawns.ChildNodes[x].Attributes[2].Value)/12));
+                playerSpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value)/16, int.Parse(spawns.ChildNodes[x].Attributes[2].Value)/16));
             }
             if (spawns.ChildNodes[x].Name.ToLower().Equals("enemyspawn"))
             {
-                enemySpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value) / 12, int.Parse(spawns.ChildNodes[x].Attributes[2].Value) / 12));
+                enemySpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value) / 16, int.Parse(spawns.ChildNodes[x].Attributes[2].Value) / 16));
             }
             if (spawns.ChildNodes[x].Name.ToLower().Equals("itemspawn"))
             {
-                itemSpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value) / 12, int.Parse(spawns.ChildNodes[x].Attributes[2].Value) / 12));
+                itemSpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value) / 16, int.Parse(spawns.ChildNodes[x].Attributes[2].Value) / 16));
             }
         }
     }
