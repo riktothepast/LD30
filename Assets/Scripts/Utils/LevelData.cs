@@ -12,7 +12,9 @@ public class LevelData {
     List<MetaData> metadata;
     List<Vector2> playerSpawns;
     List<Vector2> enemySpawns;
+    List<Vector2> items;
     List<Portal> portalSpawns;
+    List<Hazard> hazardSpawns;
     Vector2 mapSize;
 	public LevelData(){
 
@@ -24,8 +26,10 @@ public class LevelData {
         platforms = new List<PlatformData>();
         metadata = new List<MetaData>();
         portalSpawns = new List<Portal>();
+        hazardSpawns = new List<Hazard>();
         playerSpawns = new List<Vector2>();
         enemySpawns = new List<Vector2>();
+        items = new List<Vector2>();
         XmlTextReader mapReader = new XmlTextReader(new StringReader(parseFile.text));
         mapReader.Read();
         XmlDocument doc = new XmlDocument();
@@ -38,7 +42,6 @@ public class LevelData {
             }
             if (doc.ChildNodes[0].ChildNodes[x].Name.ToLower().Equals("entities"))
             {
-                Debug.Log("loading player spawn points");
                 LoadSpawnPoints(doc.ChildNodes[0].ChildNodes[x]);
             }
         }
@@ -88,6 +91,21 @@ public class LevelData {
                 }
                 portalSpawns.Add(new Portal(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value), -int.Parse(spawns.ChildNodes[x].Attributes[2].Value)), dest));
             }
+            if (spawns.ChildNodes[x].Name.ToLower().Equals("hazards"))
+            {
+                hazardSpawns.Add(new Hazard(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value), -int.Parse(spawns.ChildNodes[x].Attributes[2].Value))));
+            }
+
+            if (spawns.ChildNodes[x].Name.ToLower().Equals("enemies"))
+            {
+                enemySpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value), -int.Parse(spawns.ChildNodes[x].Attributes[2].Value)));
+            }
+
+            if (spawns.ChildNodes[x].Name.ToLower().Equals("backpacks"))
+            {
+                items.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value), -int.Parse(spawns.ChildNodes[x].Attributes[2].Value)));
+            }
+
         }
     }
 
@@ -105,9 +123,19 @@ public class LevelData {
         return portalSpawns;
     }
 
+    public List<Hazard> getHazardSpawns()
+    {
+        return hazardSpawns;
+    }
+
     public List<Vector2> getEnemySpawns()
     {
         return enemySpawns;
+    }
+
+    public List<Vector2> getItemSpawns()
+    {
+        return items;
     }
 
     public List<MetaData> getMetaData()

@@ -38,6 +38,9 @@ public class TileMap : FContainer
     FContainer frontContainer;
     List<Bullet> playerBullets;
     List<Portal> portals;
+    List<Hazard> hazards;
+    List<Item> items;
+    //List<Enemies> enemies;
     public int LevelType { get; set; }
     int[,] Tiles = new int[32, 18];
     int maxEnemyCount = 50;
@@ -100,11 +103,31 @@ public class TileMap : FContainer
 
         for (int x = portals.Count - 1; x >= 0; x--)
         {
-            FSprite portal = new FSprite("Futile_White");
-            portal.color = Color.blue;
-            portal.SetPosition(portals[x].getPosition());
-            Debug.Log(portals[x].getDestination());
-            AddChild(portal);
+            portals[x].SetPosition(portals[x].getPosition());
+            AddChild(portals[x]);
+        }
+
+        hazards = getLevelData().getHazardSpawns();
+
+        for (int x = hazards.Count - 1; x >= 0; x--)
+        {
+            FSprite haz = new FSprite("hazard");
+            haz.SetPosition(hazards[x].getPosition());
+            AddChild(haz);
+        }
+
+        for (int x = getLevelData().getEnemySpawns().Count - 1; x >= 0; x--)
+        {
+
+        }
+        items = new List<Item>();
+        if (getLevelData().getItemSpawns() !=null)
+        for (int x = getLevelData().getItemSpawns().Count - 1; x >= 0; x--)
+        {
+            Item it = new Item(getLevelData().getItemSpawns()[x]);
+            it.SetPosition(it.getPosition());
+            items.Add(it);
+            AddChild(it);
         }
     }
 
@@ -123,6 +146,7 @@ public class TileMap : FContainer
             AddChild(plat);
         }
         playerBullets = new List<Bullet>();
+        hazards = new List<Hazard>();
         particleContainer = new FContainer();
         AddChild(particleContainer);
         enemyContainer = new FContainer();
@@ -136,6 +160,7 @@ public class TileMap : FContainer
         frontContainer = new FContainer();
         AddChild(frontContainer);
         this.alpha = 0;
+
         TweenConfig tw = new TweenConfig();
         tw.floatProp("alpha", 1);
         Go.to(this, 10f, tw);
@@ -161,8 +186,62 @@ public class TileMap : FContainer
             if (Rectangle.AABBCheck(portals[x].getAABBBoundingBox(), getPlayer().getAABBBoundingBox()))
             {
                 Debug.Log("will transport to: " + portals[x].getDestination());
-                CurrentPage.ChangeLevel("MainArea");
-                
+
+                switch (portals[x].getDestination())
+                {
+                    case 0:
+                        CurrentPage.ChangeLevel("MainArea");
+                        break;
+                    case 1:
+                        CurrentPage.ChangeLevel("MainArea");
+                        break;
+                    case 2:
+                        CurrentPage.ChangeLevel("otherLevel");
+                        break;
+
+                    case 5:
+                        CurrentPage.ChangeLevel("MainArea");
+                        break;
+                }
+
+            }
+        }
+
+
+        for (int x = hazards.Count - 1; x >= 0; x--)
+        {
+            if (Rectangle.AABBCheck(hazards[x].getAABBBoundingBox(), getPlayer().getAABBBoundingBox()))
+            {
+                player.HealthPoints = 0;
+            }
+        }
+
+        for (int x = items.Count - 1; x >= 0; x--)
+        {
+            if (Rectangle.AABBCheck(items[x].getAABBBoundingBox(), getPlayer().getAABBBoundingBox()))
+            {
+                if (items[x].getDestination() == 0)
+                {
+                    items[x].RemoveFromContainer();
+                    items.Remove(items[x]);
+                    AddChild(new Message("font", "empty!", player.Position));
+
+                }else
+                //jump
+                    if (items[x].getDestination() == 1)
+                    {
+                        items[x].RemoveFromContainer();
+                        items.Remove(items[x]);
+                        player.BackPackFuel = player.BackPackFuel + 1;
+                        AddChild(new Message("font", "jump upgrade!", player.Position));
+                    }
+                    else {
+                        items[x].RemoveFromContainer();
+                        items.Remove(items[x]);
+                        player.FiringCadence = player.FiringCadence - 50;
+                        AddChild(new Message("font", "blaster upgrade!", player.Position));
+
+                    }
             }
         }
 
@@ -405,5 +484,17 @@ public class TileMap : FContainer
         yield return new WaitForSeconds(5);
         alpha = 1f;
     }
-  
+
+    public void CallGameOver()
+    {
+        player.RemoveFromContainer();
+        TweenConfig tw = new TweenConfig();
+        tw.floatProp("alpha", 0);
+        tw.onComplete(theTween =>
+        {
+            Game.instance.GoToPage(PageType.MenuPage);
+        });
+        Go.to(this, 2f, tw);
+
+    }
 }

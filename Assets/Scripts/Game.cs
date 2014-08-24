@@ -39,7 +39,7 @@ public class Game : MonoBehaviour
 				GameConfig.LoadPreviousConfig();
 
                 Futile.atlasManager.LoadAtlas("Atlases/SpriteSheet");
-				
+                Futile.atlasManager.LoadFont("font", "font", "Atlases/font", 0, 0);
 				_stage = Futile.stage;
 		
 				GoToPage (PageType.MenuPage);

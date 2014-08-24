@@ -20,21 +20,22 @@ public class Bullet : Entity {
         impactBoundingBox = new Rectangle();
         angle = ang;
 
-        Texture = new FSprite("Futile_White");
-        Texture.scale = 0.8f;
-        Size = new Vector2(Texture.width*0.2f, Texture.height*0.2f);
+        Texture = new FSprite("bullet");
+
+        Size = new Vector2(Texture.width*0.6f, Texture.height*0.6f);
         
         AddChild(Texture);
         TileMap.CurrentMap.getPlayerBulletList().Add(this);
         TileMap.CurrentMap.EntityContainer().AddChild(this);
         Remove = false;
+        detectionAccuracy = (int)(Size.x / 2) + 1;
+
     }
 
     public override void CheckAndUpdateMovement()
     {
-        float step = 10f * Time.deltaTime;
-        velocity.x += step * Mathf.Cos(angle);
-        velocity.y += step * Mathf.Sin(angle);
+        float step = 20f * Time.deltaTime;
+        velocity.x += step * -angle;
     }
 
     public override void Update()

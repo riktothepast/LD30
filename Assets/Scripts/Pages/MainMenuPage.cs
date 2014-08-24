@@ -13,6 +13,8 @@ public class MainMenuPage : Page
     {
 		gameLogo = new FSprite("Futile_White");
 		Play = new FButton("Futile_White", "Futile_White");
+        Play.AddLabel("font", "begin adventure", Color.red);
+        Play.scaleX *= 2;
         Play.SignalRelease += PlayRelease;
     }
 
