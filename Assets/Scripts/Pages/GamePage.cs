@@ -8,6 +8,12 @@ public class GamePage : Page
     FContainer touchControlsContainer;
     public static FContainer HeadsUpDisplay;
     public Vector2 camera = Vector2.zero;
+    Player player;
+
+    public Player getPlayer()
+    {
+        return player;
+    }
 
     public GamePage()
     {
@@ -19,27 +25,52 @@ public class GamePage : Page
         bg.height = Futile.screen.height;
         AddChild(bg);
         bg.SetPosition(new Vector2(Futile.screen.width / 2, Futile.screen.height/2));
-
     }
 
     override public void Start()
     {
         tileMap = new TileMap(this);
-        tileMap.LoadTileMap("Text/testMap");
+        tileMap.LoadTileMap("Text/MainArea");
+        tileMap.LevelType = 5;
+        player = new Player();
+        tileMap.setPlayer(player);
+        tileMap.getPlayer().Position = tileMap.getLevelData().getPlayerSpawns()[0];
         Futile.stage.AddChild(tileMap);
         Futile.stage.AddChild(HeadsUpDisplay);
         
         ListenForUpdate(Update);
-        
     }
 
+    public void  ChangeLevel(string value){
+        Futile.stage.RemoveChild(tileMap);
+        Futile.stage.RemoveChild(HeadsUpDisplay);
+        this.RemoveAllChildren();
+        Player p = tileMap.getPlayer();
+        tileMap = new TileMap(this);
+        tileMap.LoadTileMap("Text/"+value);
+        tileMap.setPlayer(p);
+        tileMap.getPlayer().Position = tileMap.getLevelData().getPlayerSpawns()[0];
 
+        Futile.stage.AddChild(tileMap);
+        Futile.stage.AddChild(HeadsUpDisplay);
+        p = null;
+    }
+
+    Vector2 lastPlayerPos;
     // Update is called once per frame
     public void Update()
     {
-        camera.x += Input.GetAxis("Horizontal") * 10f;
-        camera.y += Input.GetAxis("Vertical") * 10f;
+
+        camera = tileMap.getPlayer().GetPosition();
+        if(tileMap.getPlayer().GetPosition() == lastPlayerPos){
+            camera.y += Input.GetAxis("Vertical") * 100f;
+        }
+        
         FollowVector(camera);
+
+
+        tileMap.Update();
+        lastPlayerPos = tileMap.getPlayer().GetPosition();
     }
 
 
@@ -81,4 +112,5 @@ public class GamePage : Page
         return HeadsUpDisplay;
     }
 
+    
 }

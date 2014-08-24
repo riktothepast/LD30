@@ -36,7 +36,9 @@ public class TileMap : FContainer
     FParticleSystem particles;
     FContainer enemyContainer;
     FContainer frontContainer;
-
+    List<Bullet> playerBullets;
+    List<Portal> portals;
+    public int LevelType { get; set; }
     int[,] Tiles = new int[32, 18];
     int maxEnemyCount = 50;
     //List<Platform> tileSprites = new List<Platform>();
@@ -46,7 +48,18 @@ public class TileMap : FContainer
     public int Columns { get; set; }
     public int Rows { get; set; }
 
+    Player player;
     public static TileMap CurrentMap { get; private set; }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player p)
+    {
+        player = p;
+        entityContainer.AddChild(player);
+    }
 
     public static float tileSize { get; set; }
 
@@ -67,7 +80,6 @@ public class TileMap : FContainer
         CurrentPage = gp;
 		Rows = 32;
 		Columns = 18;
-       
     }
 
     public void LoadTileMap(String mapText)
@@ -80,10 +92,20 @@ public class TileMap : FContainer
         // fill TileMap with zeroes.
         loadTiles();
         TileMap.CurrentMap = this;
-        //enemyPool = new EnemyPooler();
         // size of the map
         lengthI = Tiles.GetLength(1);
         lengthJ = Tiles.GetLength(0);
+
+        portals = getLevelData().getPortalSpawns();
+
+        for (int x = portals.Count - 1; x >= 0; x--)
+        {
+            FSprite portal = new FSprite("Futile_White");
+            portal.color = Color.blue;
+            portal.SetPosition(portals[x].getPosition());
+            Debug.Log(portals[x].getDestination());
+            AddChild(portal);
+        }
     }
 
     void loadTiles()
@@ -91,16 +113,16 @@ public class TileMap : FContainer
         foreach (PlatformData platform in levelData.getPlatformData())
         {
             FSprite plat = new FSprite(platform.image);
-            //plat.height = 12;
-            //plat.width = 12;
+            plat.height = 16;
+            plat.width = 16;
             tileSize = plat.width;
             Tiles[(int)platform.x, (int)platform.y] = 1;
             // make them overlap a little to avoid those ungly lines in the rendering.
-            plat.SetPosition(new Vector2((platform.x * plat.width) * 0.99f, (-platform.y * plat.height) * 0.99f));
+            plat.SetPosition(new Vector2((platform.x * plat.width), (-platform.y * plat.height)));
 
             AddChild(plat);
         }
-
+        playerBullets = new List<Bullet>();
         particleContainer = new FContainer();
         AddChild(particleContainer);
         enemyContainer = new FContainer();
@@ -113,14 +135,42 @@ public class TileMap : FContainer
         AddChild(entityContainer);
         frontContainer = new FContainer();
         AddChild(frontContainer);
-
+        this.alpha = 0;
+        TweenConfig tw = new TweenConfig();
+        tw.floatProp("alpha", 1);
+        Go.to(this, 10f, tw);
     }
 
     // update the tilemap based on whats visible ?. 
     public void Update()
     {
-      
+        player.Update();
+
+        //update all the bullets
+        for (int x = playerBullets.Count - 1; x >= 0; x--) 
+        {
+            playerBullets[x].Update();
+            if (playerBullets[x].Remove)
+            {
+                playerBullets.Remove(playerBullets[x]);
+            }
+        }
+
+        for (int x = portals.Count - 1; x >= 0; x--)
+        {
+            if (Rectangle.AABBCheck(portals[x].getAABBBoundingBox(), getPlayer().getAABBBoundingBox()))
+            {
+                Debug.Log("will transport to: " + portals[x].getDestination());
+                CurrentPage.ChangeLevel("MainArea");
+                
+            }
+        }
+
+        if (LevelType == 5) {
+            ShakeUtil.Go(this, 0.3f, UnityEngine.Random.Range(5, 10));
+        }
     }
+   
 
     public Vector2 getSize()
     {
@@ -301,6 +351,10 @@ public class TileMap : FContainer
         return frontContainer;
     }
 
+    public List<Bullet> getPlayerBulletList()
+    {
+        return playerBullets;
+    }
   
 
     public void drawHitBox(Rectangle rect, Color color)
@@ -346,5 +400,10 @@ public class TileMap : FContainer
         }
     }
 
+    IEnumerator FadeIn() {
+
+        yield return new WaitForSeconds(5);
+        alpha = 1f;
+    }
   
 }

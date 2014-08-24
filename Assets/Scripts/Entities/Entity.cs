@@ -150,25 +150,13 @@ public abstract class Entity : FContainer
 
     public virtual void Update()
     {
-        if (!deadLogic)
-        {
             CheckAndUpdateMovement();
             applyGravity();
             applyFriction();
             MoveAsFarAsPossible();
             StopMovingIfBlocked();
             SetPosition(position);
-        }
-        else {
-            rotation += 10f * impactRotation;
-            useGravity = true;
-            applyGravity();
-            UpdatePosition();
-            SetPosition(position);
-            if (TileMap.CurrentMap.IsOutOfBounds(Position))
-                Destroy();
-        }
-
+     
         currentTime = timeToWait - Time.time;
 
         if (currentTime > 0)

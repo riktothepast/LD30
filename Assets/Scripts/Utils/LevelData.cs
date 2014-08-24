@@ -12,7 +12,7 @@ public class LevelData {
     List<MetaData> metadata;
     List<Vector2> playerSpawns;
     List<Vector2> enemySpawns;
-    List<Vector2> itemSpawns;
+    List<Portal> portalSpawns;
     Vector2 mapSize;
 	public LevelData(){
 
@@ -23,7 +23,7 @@ public class LevelData {
         parseFile = Resources.Load(pathToXml) as TextAsset;
         platforms = new List<PlatformData>();
         metadata = new List<MetaData>();
-        itemSpawns = new List<Vector2>();
+        portalSpawns = new List<Portal>();
         playerSpawns = new List<Vector2>();
         enemySpawns = new List<Vector2>();
         XmlTextReader mapReader = new XmlTextReader(new StringReader(parseFile.text));
@@ -36,7 +36,11 @@ public class LevelData {
             if (doc.ChildNodes[0].ChildNodes[x].Name.ToLower().Equals("frontlayer")) {
                 LoadTiles(doc.ChildNodes[0].ChildNodes[x], platforms);
             }
-
+            if (doc.ChildNodes[0].ChildNodes[x].Name.ToLower().Equals("entities"))
+            {
+                Debug.Log("loading player spawn points");
+                LoadSpawnPoints(doc.ChildNodes[0].ChildNodes[x]);
+            }
         }
     }
 
@@ -64,71 +68,28 @@ public class LevelData {
     void LoadSpawnPoints(XmlNode spawns) {
         for (int x = 0; x < spawns.ChildNodes.Count; x++) {
 
-            if (spawns.ChildNodes[x].Name.ToLower().Equals("playerspawn")) {
-                playerSpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value)/16, int.Parse(spawns.ChildNodes[x].Attributes[2].Value)/16));
+            if (spawns.ChildNodes[x].Name.ToLower().Equals("playerspawn"))
+            {
+                playerSpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value), -int.Parse(spawns.ChildNodes[x].Attributes[2].Value)));
             }
             if (spawns.ChildNodes[x].Name.ToLower().Equals("enemyspawn"))
             {
                 enemySpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value) / 16, int.Parse(spawns.ChildNodes[x].Attributes[2].Value) / 16));
             }
-            if (spawns.ChildNodes[x].Name.ToLower().Equals("itemspawn"))
+            if (spawns.ChildNodes[x].Name.ToLower().Equals("portals"))
             {
-                itemSpawns.Add(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value) / 16, int.Parse(spawns.ChildNodes[x].Attributes[2].Value) / 16));
+                int dest = 0;
+                for (int t = 3; t < 9; t++ )
+                {
+                    if (spawns.ChildNodes[x].Attributes[t].Value!="0")
+                    {
+                        dest = int.Parse(spawns.ChildNodes[x].Attributes[t].Value) - 1;
+                    }
+                }
+                portalSpawns.Add(new Portal(new Vector2(int.Parse(spawns.ChildNodes[x].Attributes[1].Value), -int.Parse(spawns.ChildNodes[x].Attributes[2].Value)), dest));
             }
         }
     }
-
-	private void setPlatformData(IList platform_list){
-		foreach (object platform in platform_list) {
-			IDictionary temp_platform = (IDictionary)platform;
-			double temp_x = (double) temp_platform ["x"] ;
-			float x = (float)temp_x;
-			double temp_y = (double) temp_platform ["y"] ;
-			float y = (float)temp_y;
-			string image = (string)temp_platform ["image"];
-			platforms.Add (new PlatformData(x,y,image));
-		}
-	}
-
-    private void setPlayerData(IList platform_list)
-    {
-        foreach (object platform in platform_list)
-        {
-            IDictionary temp_platform = (IDictionary)platform;
-            double temp_x = (double)temp_platform["x"];
-            float x = (float)temp_x;
-            double temp_y = (double)temp_platform["y"];
-            float y = (float)temp_y;
-            playerSpawns.Add(new Vector2(x,y));
-        }
-    }
-
-    private void setEnemyData(IList enemy_list)
-    {
-        foreach (object enemy in enemy_list)
-        {
-            IDictionary temp_enemy = (IDictionary)enemy;
-            double temp_x = (double)temp_enemy["x"];
-            float x = (float)temp_x;
-            double temp_y = (double)temp_enemy["y"];
-            float y = (float)temp_y;
-            enemySpawns.Add(new Vector2(x, y));
-        }
-    }
-
-    private void setItemData(IList platform_list)
-    {
-        foreach (object platform in platform_list)
-        {
-            IDictionary temp_platform = (IDictionary)platform;
-            double temp_x = (double)temp_platform["x"];
-            float x = (float)temp_x;
-            double temp_y = (double)temp_platform["y"];
-            float y = (float)temp_y;
-            itemSpawns.Add(new Vector2(x,y));
-        }
-    }
-
 
 	public List<PlatformData> getPlatformData(){
 		return platforms;
@@ -139,9 +100,9 @@ public class LevelData {
         return playerSpawns;
     }
 
-    public List<Vector2> getItemSpawns()
+    public List<Portal> getPortalSpawns()
     {
-        return itemSpawns;
+        return portalSpawns;
     }
 
     public List<Vector2> getEnemySpawns()
