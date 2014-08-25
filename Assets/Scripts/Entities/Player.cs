@@ -51,8 +51,8 @@ public class Player : Entity {
         AirFriction = 0.58f;
         ammoLeft.Preallocate(5);
         detectionAccuracy = (int)(Size.x / 2) + 1;
-        firingCadence = 300f;
-        firingCadenceTime = 300f;
+        firingCadence = 800;
+        firingCadenceTime = 800;
     }
 
     public override void CheckAndUpdateMovement()
@@ -61,8 +61,32 @@ public class Player : Entity {
         if (TileMap.CurrentMap.alpha > 0.2f)
         {
             float step = 15f * Time.deltaTime;
-            step *= Input.GetAxis("Horizontal") * 10f;
+            if (Input.GetKey(KeyCode.A))
+            {
+                step *= -15f;
+                animatedSprite.scaleX = 1;
+
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                step *= 15f;
+                animatedSprite.scaleX = -1;
+
+            }
+            else {
+                step = 0;
+            }
+            
             velocity.x += step;
+
+            if (Input.GetKey(KeyCode.LeftArrow) )
+            {
+                animatedSprite.scaleX = 1;
+            }
+            else if (Input.GetKey(KeyCode.RightArrow))
+            {
+                animatedSprite.scaleX = -1;
+            }
 
             if (Ground() || currenBackPackFuel > 0)
                 if (Input.GetKeyDown(KeyCode.Space))
@@ -87,20 +111,11 @@ public class Player : Entity {
 
         firingCadenceTime += Time.deltaTime * 1000;
 
-        Vector2 pos = GlobalToLocal(Input.mousePosition);
-
-        if (pos.x > Position.x)
-        {
-            animatedSprite.scaleX = -1;
-        }
-        else {
-            animatedSprite.scaleX = 1;
-        }
 
         if (FiringCadenceTime < FiringCadence)
             return;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
         {
             FiringCadenceTime = 0;
             if (ammoLeft.hasFreeItems()) {
@@ -109,6 +124,7 @@ public class Player : Entity {
                 ammoLeft.GetFreeItem().init(wheretoSpawns, animatedSprite.scaleX);
             }
         }
+        velocity.x = 0;
 
     }
 }

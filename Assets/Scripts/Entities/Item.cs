@@ -20,6 +20,7 @@ public class Item :FContainer{
         animatedSprite = new FSprite("tank");
         AddChild(animatedSprite);
         boundingBox = new Rectangle();
+        ListenForUpdate(Update);
     }
 
     public Vector2 getPosition()
@@ -34,5 +35,11 @@ public class Item :FContainer{
     public Rectangle getAABBBoundingBox() {
         boundingBox.setValues(position.x, position.y, animatedSprite.width, animatedSprite.height);
         return boundingBox;
+    }
+
+    public void Update()
+    {
+        float posY = Mathf.Lerp(position.y - 10f, position.y + 10f, Mathf.PingPong(Time.time, 1.0f));
+        SetPosition(position.x, posY);
     }
 }

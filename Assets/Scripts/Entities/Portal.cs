@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Portal  :FContainer{
+public class Portal : FContainer{
 
     Vector2 position;
     int destination;

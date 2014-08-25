@@ -40,6 +40,8 @@ public class TileMap : FContainer
     List<Portal> portals;
     List<Hazard> hazards;
     List<Item> items;
+    List<Entity> enemies;
+    FLabel stats;
     //List<Enemies> enemies;
     public int LevelType { get; set; }
     int[,] Tiles = new int[32, 18];
@@ -129,6 +131,15 @@ public class TileMap : FContainer
             items.Add(it);
             AddChild(it);
         }
+        enemies = new List<Entity>();
+        if (getLevelData().getEnemySpawns() != null)
+            for (int x = getLevelData().getEnemySpawns().Count - 1; x >= 0; x--)
+            {
+                EnemyPortal it = new EnemyPortal(getLevelData().getEnemySpawns()[x]);
+                it.SetPosition(it.Position);
+                enemies.Add(it);
+                AddChild(it);
+            }
     }
 
     void loadTiles()
@@ -164,6 +175,11 @@ public class TileMap : FContainer
         TweenConfig tw = new TweenConfig();
         tw.floatProp("alpha", 1);
         Go.to(this, 10f, tw);
+
+        stats = new FLabel("font", "Jump Packs: 0; reload times: 0");
+        CurrentPage.GetHUD().AddChild(stats);
+        stats.scale = 0.9f;
+        stats.SetPosition(new Vector2(Futile.screen.halfWidth, Futile.screen.height * 0.9f));
     }
 
     // update the tilemap based on whats visible ?. 
@@ -193,19 +209,30 @@ public class TileMap : FContainer
                         CurrentPage.ChangeLevel("MainArea");
                         break;
                     case 1:
-                        CurrentPage.ChangeLevel("MainArea");
+                        Debug.Log("got to final page");
+                        Game.instance.GoToPage(PageType.FinalPage);
                         break;
                     case 2:
                         CurrentPage.ChangeLevel("otherLevel");
                         break;
 
+                    case 3:
+                        CurrentPage.ChangeLevel("vertical");
+                        break;
+
                     case 5:
-                        CurrentPage.ChangeLevel("MainArea");
+                        Game.instance.GoToPage(PageType.FinalPage);
+                        break;
+
+                    case 6:
+                        Game.instance.GoToPage(PageType.FinalPage);
                         break;
                 }
 
             }
         }
+
+
 
 
         for (int x = hazards.Count - 1; x >= 0; x--)
@@ -215,6 +242,19 @@ public class TileMap : FContainer
                 player.HealthPoints = 0;
             }
         }
+        
+        for (int x = enemies.Count - 1; x >= 0; x--)
+        {
+            if (Rectangle.AABBCheck(enemies[x].getAABBBoundingBox(), getPlayer().getAABBBoundingBox()))
+            {
+                player.HealthPoints = 0;
+            }
+            if (enemies[x].Remove)
+            {
+                enemies.Remove(enemies[x]);
+            }
+        }
+
 
         for (int x = items.Count - 1; x >= 0; x--)
         {
@@ -238,7 +278,7 @@ public class TileMap : FContainer
                     else {
                         items[x].RemoveFromContainer();
                         items.Remove(items[x]);
-                        player.FiringCadence = player.FiringCadence - 50;
+                        player.FiringCadence = player.FiringCadence - 100;
                         AddChild(new Message("font", "blaster upgrade!", player.Position));
 
                     }
@@ -248,6 +288,8 @@ public class TileMap : FContainer
         if (LevelType == 5) {
             ShakeUtil.Go(this, 0.3f, UnityEngine.Random.Range(5, 10));
         }
+
+        stats.text = "Jump Packs: "+ player.BackPackFuel + "; reload times (ms):" + player.FiringCadence;
     }
    
 
@@ -434,7 +476,11 @@ public class TileMap : FContainer
     {
         return playerBullets;
     }
-  
+
+    public List<Entity> getEnemyList()
+    {
+        return enemies;
+    }
 
     public void drawHitBox(Rectangle rect, Color color)
     {

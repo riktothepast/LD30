@@ -7,7 +7,8 @@ public enum PageType
 		MenuPage,
 		LevelSelectPage,
 		OptionsPage,
-		GamePage
+		GamePage,
+        FinalPage
 }
 
 public class Game : MonoBehaviour
@@ -63,9 +64,9 @@ public class Game : MonoBehaviour
 						pageToCreate = new GamePage ();
 				}
 
-				if (pageType == PageType.OptionsPage)
+                if (pageType == PageType.FinalPage)
 				{
-						pageToCreate = new OptionsPage ();
+						pageToCreate = new FinalPage ();
 				}
 
 				if (pageToCreate != null) {

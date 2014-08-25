@@ -29,7 +29,8 @@ public class Bullet : Entity {
         TileMap.CurrentMap.EntityContainer().AddChild(this);
         Remove = false;
         detectionAccuracy = (int)(Size.x / 2) + 1;
-
+        velocity = Vector2.zero;
+        boundingBox = new Rectangle();
     }
 
     public override void CheckAndUpdateMovement()
@@ -57,6 +58,22 @@ public class Bullet : Entity {
             velocity = Vector2.zero;
             Remove = true;
         }
+
+        for (int x = TileMap.CurrentMap.getEnemyList().Count-1; x >= 0; x--)
+        {
+            if (TileMap.CurrentMap.getEnemyList() != null)
+            {
+                if (Rectangle.AABBCheck(getAABBBoundingBox(), TileMap.CurrentMap.getEnemyList()[x].getAABBBoundingBox()))
+                {
+                    Destroy();
+                    TileMap.CurrentMap.getPlayer().AmmoLeft().FlagFreeItem(this);
+                    velocity = Vector2.zero;
+                    Remove = true;
+                    TileMap.CurrentMap.getEnemyList()[x].HealthPoints = TileMap.CurrentMap.getEnemyList()[x].HealthPoints - 2;
+                }
+            }
+        }
+        
     }
 
 }
