@@ -76,7 +76,7 @@
 3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3</FrontLayer>
   <Entities>
     <PlayerSpawn id="0" x="192" y="1152" />
-    <Portals id="1" x="192" y="80" TheVoid="0" Freezor="0" Hout="0" OldPlace="0" GoldLand="0" Main="6" />
+    <Portals id="1" x="192" y="80" TheVoid="0" Freezor="0" Hout="0" OldPlace="0" GoldLand="0" Main="1" />
     <Hazards id="2" x="96" y="1168" />
     <Hazards id="3" x="80" y="1168" />
     <Hazards id="4" x="80" y="1168" />

@@ -209,13 +209,11 @@ public class TileMap : FContainer
                         CurrentPage.ChangeLevel("MainArea");
                         break;
                     case 1:
-                        Debug.Log("got to final page");
-                        Game.instance.GoToPage(PageType.FinalPage);
+                        CurrentPage.ChangeLevel("MainArea");
                         break;
                     case 2:
                         CurrentPage.ChangeLevel("otherLevel");
                         break;
-
                     case 3:
                         CurrentPage.ChangeLevel("vertical");
                         break;
@@ -223,7 +221,6 @@ public class TileMap : FContainer
                     case 5:
                         Game.instance.GoToPage(PageType.FinalPage);
                         break;
-
                     case 6:
                         Game.instance.GoToPage(PageType.FinalPage);
                         break;
